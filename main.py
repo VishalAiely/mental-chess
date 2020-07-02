@@ -1,3 +1,35 @@
+import os
+import time
+import playsound
+import speech_recognition as sr
+from gtts import gTTS
+
+def speak(text):
+    tts = gTTS(text=text, lang='en')
+    filename = "temp.mp3"
+    tts.save(filename)
+    playsound.playsound(filename)
+
+def get_audio():
+    r = sr.Recognizer()
+    with sr.Microphone() as source:
+        audio = r.listen(source)
+        spoken = ""
+
+        try:
+            spoken = r.recognize_google(audio)
+            print(spoken)
+        except Exception as e:
+            print("Exception: " + str(e))
+
+    return spoken
+
+        
+
+def main():
+    speak("Hello")
+    get_audio()
+
 
 if __name__ == '__main__':
-    pass
+    main()
