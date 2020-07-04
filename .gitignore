@@ -1,2 +1,5 @@
 /.git
 /temp.mp3
+generatespec.py
+.DS_Store
+__pycache__
