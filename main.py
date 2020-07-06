@@ -1,35 +1,92 @@
-import os
-import time
+from audio import speak, get_audio, get_move
+import chess
+import chess.svg
 import playsound
-import speech_recognition as sr
-from gtts import gTTS
+from stockfish import Stockfish
+from datetime import datetime
+import random
 
-def speak(text):
-    tts = gTTS(text=text, lang='en')
-    filename = "temp.mp3"
-    tts.save(filename)
-    playsound.playsound(filename)
+#Gets player move and makes sure it is valid
+def playermove(boardstate):
+    move = get_move()
 
-def get_audio():
-    r = sr.Recognizer()
-    with sr.Microphone() as source:
-        audio = r.listen(source)
-        spoken = ""
+    if 'quit' in move:
+        speak('Thanks for playing, here is the board')
+        print(boardstate)
+        exit()
 
+    while True:
         try:
-            spoken = r.recognize_google(audio)
-            print(spoken)
-        except Exception as e:
-            print("Exception: " + str(e))
+            if chess.Move.from_uci(move) in boardstate.legal_moves:
+                return move
+            else:
+                #playsound.playsound('audio/invalid.mp3')
+                speak('Invalid move, try again')
+        except:
+            #playsound.playsound('audio/nohear.mp3')
+            speak("I didn't hear that")
+            #print(f'I heard: {move}')
 
-    return spoken
 
-        
+        move = get_move()
+
+        if 'quit' in move:
+            speak('Thanks for playing, here is the board')
+            print(boardstate)
+            exit() 
+    
+    
+    return move
 
 def main():
-    speak("Hello")
-    get_audio()
+    #Deteremine start
+    random.seed(datetime.now())
+    white = random.randint(0,1)
 
+    #initialize board and stockfish
+    board = chess.Board()
+    fishy = Stockfish('/Users/vishalaiely/Downloads/stockfish-11-mac/Mac/stockfish-11-64')
 
+    if white:
+        #playsound.playsound('audio/WhiteStart.mp3')
+        speak('Hello, you have the white pieces')
+    else:
+        #playsound.playsound('audio/BlackStart.mp3')
+        speak('Hello, you have the black pieces')
+
+    #Game executes and breaks when over
+    while not board.is_game_over():
+        if white:
+            board.push_uci(playermove(board))
+
+            fishy.set_fen_position(board.fen())
+            compMove = fishy.get_best_move()
+            board.push_uci(compMove)
+
+            speak(compMove)
+
+        else:
+           fishy.set_fen_position(board.fen())
+           compMove = fishy.get_best_move()
+           board.push_uci(compMove)
+
+           speak(compMove)
+
+           board.push_uci(playermove(board))
+
+    #Determines end state of game
+    if board.result() is '1-0':
+        #playsound.playsound('audio/WhiteWin.mp3')
+        speak('White wins')
+    elif board.reset() is '0-1':
+       #playsound.playsound('audio/BlackWin.mp3')
+       speak('Black wins')
+    elif board.is_stalemate():
+        speak('Stalemate')
+    else:
+        speak('Draw')
+
+    speak('Thank you for playing!')
+    
 if __name__ == '__main__':
     main()
