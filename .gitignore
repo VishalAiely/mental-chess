@@ -3,3 +3,4 @@
 generatespec.py
 .DS_Store
 __pycache__
+audio/

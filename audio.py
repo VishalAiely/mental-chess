@@ -5,6 +5,7 @@ import speech_recognition as sr
 import chess
 from gtts import gTTS
 
+#use for word to piece translation in possible fen input (currently uci)
 PieceDict = {
     'Knight' : 'N',
     'Bishop' : 'B',
@@ -14,6 +15,8 @@ PieceDict = {
     'Pawn' : ''
 }
 
+#From TechwithTim speech recognition tutorial via youtube: 
+#https://www.youtube.com/watch?v=-AzGZ_CHzJk
 def speak(text):
     tts = gTTS(text=text, lang='en')
     filename = "audio/temp.mp3"
@@ -33,6 +36,7 @@ def get_audio():
             print("Exception: " + str(e))
 
     return spoken
+#------------------------------------------------------
 
 #Gets the move and converts it to the proper format
 def get_move():

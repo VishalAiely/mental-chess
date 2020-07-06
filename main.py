@@ -6,11 +6,9 @@ from stockfish import Stockfish
 from datetime import datetime
 import random
 
+#Gets player move and makes sure it is valid
 def playermove(boardstate):
     move = get_move()
-
-    #print(f"Player move: {move}")
-    #print(boardstate.legal_moves)
 
     if 'quit' in move:
         speak('Thanks for playing, here is the board')
@@ -22,10 +20,12 @@ def playermove(boardstate):
             if chess.Move.from_uci(move) in boardstate.legal_moves:
                 return move
             else:
-                playsound.playsound('audio/invalid.mp3')
+                #playsound.playsound('audio/invalid.mp3')
+                speak('Invalid move, try again')
         except:
-            playsound.playsound('audio/nohear.mp3')
-            print(f'I heard: {move}')
+            #playsound.playsound('audio/nohear.mp3')
+            speak("I didn't hear that")
+            #print(f'I heard: {move}')
 
 
         move = get_move()
@@ -48,10 +48,13 @@ def main():
     fishy = Stockfish('/Users/vishalaiely/Downloads/stockfish-11-mac/Mac/stockfish-11-64')
 
     if white:
-        playsound.playsound('audio/WhiteStart.mp3')
+        #playsound.playsound('audio/WhiteStart.mp3')
+        speak('Hello, you have the white pieces')
     else:
-        playsound.playsound('audio/BlackStart.mp3')
+        #playsound.playsound('audio/BlackStart.mp3')
+        speak('Hello, you have the black pieces')
 
+    #Game executes and breaks when over
     while not board.is_game_over():
         if white:
             board.push_uci(playermove(board))
@@ -71,10 +74,13 @@ def main():
 
            board.push_uci(playermove(board))
 
+    #Determines end state of game
     if board.result() is '1-0':
-        playsound.playsound('audio/WhiteWin.mp3')
+        #playsound.playsound('audio/WhiteWin.mp3')
+        speak('White wins')
     elif board.reset() is '0-1':
-       playsound.playsound('audio/BlackWin.mp3')
+       #playsound.playsound('audio/BlackWin.mp3')
+       speak('Black wins')
     elif board.is_stalemate():
         speak('Stalemate')
     else:
@@ -82,6 +88,5 @@ def main():
 
     speak('Thank you for playing!')
     
-
 if __name__ == '__main__':
     main()
